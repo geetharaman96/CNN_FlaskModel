@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Veggie Classifier</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #image-preview {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        #predict-button {
+            display: block;
+            margin: 0 auto;
+        }
+
+        #prediction-result {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Veggie Classifier</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="file" accept="image/*">
+            <img id="image-preview" src="#" alt="Uploaded Image">
+            <button type="button" id="predict-button" class="btn btn-primary">Predict</button>
+            <div id="prediction-result"></div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Show image preview when an image is selected
+            $('#file-input').change(function() {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#image-preview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(this.files[0]);
+            });
+
+            // Send image to the server for prediction on button click
+            $('#predict-button').click(function() {
+                var form_data = new FormData($('#upload-form')[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '/predict',
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(response) {
+                        $('#prediction-result').text('Predicted Vegetable: ' + response.predicted_vegetable);
+                    },
+                    error: function(error) {
+                        $('#prediction-result').text('Error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
